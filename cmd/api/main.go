@@ -12,16 +12,14 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/joho/godotenv"
+
+	"github.com/thepratiksah/nextask/internal/config"
 )
 
 func main() {
-	godotenv.Load()
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
+	// Load config — explicit, typed, single source of truth.
+	// Compare to Node.js: process.env.PORT (implicit, everywhere)
+	cfg := config.Load()
 
 	r := chi.NewRouter()
 
@@ -35,12 +33,12 @@ func main() {
 	})
 
 	srv := &http.Server{
-		Addr:    ":" + port,
+		Addr:    ":" + cfg.Port,
 		Handler: r,
 	}
 
 	go func() {
-		log.Printf("server starting on port %s", port)
+		log.Printf("server starting on port %s", cfg.Port)
 		if err := srv.ListenAndServe(); err != nil {
 			log.Fatalf("server error: %v", err)
 		}
